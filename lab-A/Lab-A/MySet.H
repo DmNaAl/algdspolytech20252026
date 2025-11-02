@@ -11,4 +11,5 @@ int set_tRemove(set_t set1, struct elem* udata, int (*Compare)(struct elem*, str
 int set_tIntersection(set_t* res, set_t set1, set_t set2, int (*Compare)(struct elem*, struct elem*));
 int set_tUnion(set_t* res, set_t set1, set_t set2, int (*Compare)(struct elem*, struct elem*));
 int set_tDestroy(set_t set1);
-int set_tPrint(set_t set1, void (*Printing)(struct elem*));
+void set_tPrint(set_t set1, char **res, char* (*Printing)(struct elem*, char*));
+int set_tGetSize(set_t set1);

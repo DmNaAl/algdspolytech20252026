@@ -1,5 +1,6 @@
 #include "MySet.H"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 //struct elem;
@@ -31,16 +32,6 @@ int set_tCreate(set_t *set1_var)
 	(*set1_var)->first = NULL;
 
 	return 1;
-}
-
-void elemDestroy(int lvl, struct MySet* el)
-{
-	if (lvl)
-	{
-		elemDestroy(lvl - 1, el->next);
-		free(el->data);
-		free(el->next);
-	}
 }
 
 int set_tAdd(set_t set1, struct elem* udata, unsigned int size, int (*Compare)(struct elem*, struct elem*))
@@ -110,16 +101,7 @@ int set_tCheck(set_t set1, struct elem* udata, int (*Compare)(struct elem*, stru
 		tmp = &((*tmp)->next);
 	}
 
-	if (flag == 0)
-	{
-		flag = 1;
-	}
-	else
-	{
-		flag = 0;
-	}
-
-	return flag;
+	return !flag;
 }
 
 int set_tRemove(set_t set1, struct elem* udata, int (*Compare)(struct elem*, struct elem*))
@@ -147,7 +129,8 @@ int set_tRemove(set_t set1, struct elem* udata, int (*Compare)(struct elem*, str
 		tmp2 = *tmp;
 		*tmp = tmp2->next;
 		tmp2->next = NULL;
-		elemDestroy(1, tmp2);
+		free(tmp2->data);
+		free(tmp2->next);
 		free(tmp2);
 		set1->size -= 1;
 
@@ -200,7 +183,7 @@ int set_tIntersection(set_t* res, set_t set1, set_t set2, int (*Compare)(struct 
 
 int set_tUnion(set_t* res, set_t set1, set_t set2, int (*Compare)(struct elem*, struct elem*))
 {
-	//int flag;
+	unsigned int i;
 	struct MySet* a;
 	struct MySet* b;
 	struct elem* tmp;
@@ -210,7 +193,8 @@ int set_tUnion(set_t* res, set_t set1, set_t set2, int (*Compare)(struct elem*, 
 
 	a = set1->first;
 	b = set2->first;
-	while (!(a == NULL))
+
+	for (i = 0; i < set1->size; i++)
 	{
 		if (!set_tCheck(*res, a->data, Compare))
 		{
@@ -225,7 +209,8 @@ int set_tUnion(set_t* res, set_t set1, set_t set2, int (*Compare)(struct elem*, 
 		}
 		a = a->next;
 	}
-	while (!(b == NULL))
+
+	for (i = 0; i < set2->size; i++)
 	{
 		if (!set_tCheck(*res, b->data, Compare))
 		{
@@ -246,24 +231,44 @@ int set_tUnion(set_t* res, set_t set1, set_t set2, int (*Compare)(struct elem*, 
 
 int set_tDestroy(set_t set1)
 {
-	elemDestroy(set1->size, set1->first);
-	free(set1->first);
+	struct MySet* cur, *nxt;
+	int i;
+
+	cur = NULL;
+	nxt = set1->first;
+	for (i = 0; i < set1->size; i++)
+	{
+		cur = nxt;
+		nxt = cur->next;
+		free(cur->data);
+		free(cur);
+	}
 	free(set1);
 
 	return 1;
 }
 
-int set_tPrint(set_t set1, void (*Printing)(struct elem*))
+void set_tPrint(set_t set1, char **res, char* (*Printing)(struct elem*, char*))
 {
-	int i;
+	unsigned int i;
 	struct MySet* cur;
 
+	*res = malloc(sizeof(char));
+	if (*res == NULL)
+	{
+		return;
+	}
+
+	**res = 0;
 	cur = set1->first;
 	for (i = 0; i < set1->size; i++)
 	{
-		(*Printing)(cur->data);
+		*res = (*Printing)(cur->data, *res);
 		cur = cur->next;
 	}
+}
 
-	return 1;
+int set_tGetSize(set_t set1)
+{
+	return set1->size;
 }

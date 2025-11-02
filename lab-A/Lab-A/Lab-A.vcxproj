@@ -125,9 +125,11 @@
   <ItemGroup>
     <ClCompile Include="Main.C" />
     <ClCompile Include="MySet.C" />
+    <ClCompile Include="Tests.C" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="MySet.H" />
+    <ClInclude Include="Tests.H" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
